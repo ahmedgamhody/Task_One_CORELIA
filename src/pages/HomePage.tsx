@@ -34,7 +34,7 @@ export default function HomePage() {
     files.forEach((file) => formData.append("files", file));
     try {
       const res = await axios.post(
-        "http://41.33.149.211:1331/upload",
+        `${import.meta.env.VITE_API_BASE_URL}/upload`,
         formData,
         {
           headers: {
