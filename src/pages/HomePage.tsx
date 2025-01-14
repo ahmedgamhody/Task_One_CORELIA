@@ -8,6 +8,8 @@ import toast from "react-hot-toast";
 
 export default function HomePage() {
   const [files, setFiles] = useState<File[]>([]);
+  const [osrResult, setOsrResult] = useState<string | null>(null);
+  console.log("osrResult", osrResult);
   const [isUploading, setIsUploading] = useState(false);
   const [progress, setProgress] = useState(0);
   // handler
@@ -49,29 +51,42 @@ export default function HomePage() {
 
     setFiles((prev) => [...prev, ...validFiles]);
   }
+  // export handler
   async function handleExport() {
     setIsUploading(true);
     const formData = new FormData();
-    files.forEach((file) => formData.append("files", file));
+    files.forEach((file) => formData.append("docs", file));
     try {
-      const res = await axios.post("/api/upload", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-        onUploadProgress: (progressEvent) => {
-          if (progressEvent.total) {
-            const progress = Math.round(
-              (progressEvent.loaded * 100) / progressEvent.total
-            );
-            console.log(`Progress: ${progress}%`);
-            setProgress(progress);
-          }
-        },
-      });
-
+      const res = await axios.post(
+        `${
+          import.meta.env.VITE_API_BASE_URL
+        }/api/v1/ocr/?doc_type=ocr&lang=auto`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+          onUploadProgress: (progressEvent) => {
+            if (progressEvent.total) {
+              const progress = Math.round(
+                (progressEvent.loaded * 100) / progressEvent.total
+              );
+              setProgress(progress);
+            }
+          },
+        }
+      );
+      if (res.data && res.data.osr) {
+        setOsrResult(res.data.osr);
+      } else {
+        setOsrResult("No result available.");
+      }
       toast.success("Files uploaded successfully!");
       setFiles([]);
       console.log(res.data);
+      if (res.data.osr) {
+        console.log(res.data.osr);
+      }
     } catch (error) {
       if (axios.isAxiosError(error)) {
         console.error("Error Response:", error.response);
