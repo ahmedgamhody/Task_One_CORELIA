@@ -10,7 +10,6 @@ export default function HomePage() {
   const [files, setFiles] = useState<File[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [progress, setProgress] = useState(0);
-
   // handler
   function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
     const itemsAsFiles = event.target.files;
@@ -20,33 +19,43 @@ export default function HomePage() {
       console.log("Uploaded files:", [...files, ...newFiles]);
     }
   }
+  function removeFileHandler(index: number) {
+    setFiles((prev) => prev.filter((_, i) => i !== index));
+  }
   async function handleExport() {
     setIsUploading(true);
-
     const formData = new FormData();
     files.forEach((file) => formData.append("files", file));
-
     try {
-      const res = await axios.post("http://41.33.149.211:1331/docs", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-        onUploadProgress: (progressEvent) => {
-          if (progressEvent.total) {
-            const progress = Math.round(
-              (progressEvent.loaded * 100) / progressEvent.total
-            );
-            console.log(`Progress: ${progress}%`);
-            setProgress(progress);
-          }
-        },
-      });
+      const res = await axios.post(
+        "http://41.33.149.211:1331/upload",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+          onUploadProgress: (progressEvent) => {
+            if (progressEvent.total) {
+              const progress = Math.round(
+                (progressEvent.loaded * 100) / progressEvent.total
+              );
+              console.log(`Progress: ${progress}%`);
+              setProgress(progress);
+            }
+          },
+        }
+      );
 
       toast.success("Files uploaded successfully!");
+      setFiles([]);
       console.log(res.data);
     } catch (error) {
-      toast.error("Upload failed .. Please try again!");
-      console.error(error);
+      if (axios.isAxiosError(error)) {
+        console.error("Error Response:", error.response);
+        toast.error(
+          error.response?.data?.message || "Upload failed .. Please try again!"
+        );
+      }
     } finally {
       setIsUploading(false);
       setProgress(0);
@@ -63,6 +72,7 @@ export default function HomePage() {
               files={files}
               handleExport={handleExport}
               isUploading={isUploading}
+              removeFileHandler={removeFileHandler}
             />
           </BoxContainer>
           <div className="space-y-6">
