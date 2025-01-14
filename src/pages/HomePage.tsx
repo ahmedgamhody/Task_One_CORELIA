@@ -33,24 +33,20 @@ export default function HomePage() {
     const formData = new FormData();
     files.forEach((file) => formData.append("files", file));
     try {
-      const res = await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL}/upload`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-          onUploadProgress: (progressEvent) => {
-            if (progressEvent.total) {
-              const progress = Math.round(
-                (progressEvent.loaded * 100) / progressEvent.total
-              );
-              console.log(`Progress: ${progress}%`);
-              setProgress(progress);
-            }
-          },
-        }
-      );
+      const res = await axios.post("/api/upload", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        onUploadProgress: (progressEvent) => {
+          if (progressEvent.total) {
+            const progress = Math.round(
+              (progressEvent.loaded * 100) / progressEvent.total
+            );
+            console.log(`Progress: ${progress}%`);
+            setProgress(progress);
+          }
+        },
+      });
 
       toast.success("Files uploaded successfully!");
       setFiles([]);
