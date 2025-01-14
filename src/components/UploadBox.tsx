@@ -81,7 +81,7 @@ export default function UploadBox({
             </svg>
           </div>
           <p className="mt-4 text-lg font-medium text-gray-900">
-            Drag &amp; drop filess here
+            Drag &amp; drop files here
           </p>
           <p className="mt-2 text-sm text-gray-500">
             Support for PDF, PNG, JPG (up to 10MB)
