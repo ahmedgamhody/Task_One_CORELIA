@@ -28,6 +28,27 @@ export default function HomePage() {
   function removeFileHandler(index: number) {
     setFiles((prev) => prev.filter((_, i) => i !== index));
   }
+  // Drag-and-drop handlers
+  function handleDragOver(event: React.DragEvent<HTMLDivElement>) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+
+  function handleDrop(event: React.DragEvent<HTMLDivElement>) {
+    event.preventDefault();
+    event.stopPropagation();
+    const droppedFiles = event.dataTransfer.files;
+    const newFiles = Array.from(droppedFiles);
+    const maxSize = 10 * 1024 * 1024;
+    const validFiles = newFiles.filter((file) => file.size <= maxSize);
+    const invalidFiles = newFiles.filter((file) => file.size > maxSize);
+
+    if (invalidFiles.length > 0) {
+      toast.error("One or more files exceed the 10MB limit.");
+    }
+
+    setFiles((prev) => [...prev, ...validFiles]);
+  }
   async function handleExport() {
     setIsUploading(true);
     const formData = new FormData();
@@ -82,6 +103,8 @@ export default function HomePage() {
               handleFileChange={handleFileChange}
               isUploading={isUploading}
               progress={progress}
+              onDragOver={handleDragOver}
+              onDrop={handleDrop}
             />
           </div>
         </div>

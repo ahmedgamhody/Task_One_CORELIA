@@ -5,11 +5,15 @@ interface IUploadBoxProps {
   handleFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   isUploading: boolean;
   progress: number;
+  onDragOver: (e: React.DragEvent<HTMLDivElement>) => void;
+  onDrop: (e: React.DragEvent<HTMLDivElement>) => void;
 }
 export default function UploadBox({
   handleFileChange,
   isUploading,
   progress,
+  onDragOver,
+  onDrop,
 }: IUploadBoxProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   function openUploadWindow() {
@@ -25,6 +29,8 @@ export default function UploadBox({
           tabIndex={0}
           className="border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all duration-200 border-gray-300 hover:border-blue-400 hover:bg-gray-50"
           onClick={openUploadWindow}
+          onDragOver={onDragOver}
+          onDrop={onDrop}
         >
           <div className="relative">
             <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center gap-2">
