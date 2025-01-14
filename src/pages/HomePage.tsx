@@ -15,7 +15,13 @@ export default function HomePage() {
     const itemsAsFiles = event.target.files;
     if (itemsAsFiles) {
       const newFiles = Array.from(itemsAsFiles);
-      setFiles((prev) => [...prev, ...newFiles]);
+      const maxSize = 10 * 1024 * 1024;
+      const validFiles = newFiles.filter((file) => file.size <= maxSize);
+      const invalidFiles = newFiles.filter((file) => file.size > maxSize);
+      if (invalidFiles.length > 0) {
+        toast.error("One or more files exceed the 10MB limit.");
+      }
+      setFiles((prev) => [...prev, ...validFiles]);
       console.log("Uploaded files:", [...files, ...newFiles]);
     }
   }
